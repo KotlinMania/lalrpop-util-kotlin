@@ -79,6 +79,16 @@ end, then port. Don't reorder, summarize, or "improve."
   Empty shells inflate symbol counts without porting any behavior.
 - **Tests live in `commonTest`.** Inline `#[cfg(test)] mod tests` blocks
   port to `commonTest` mirroring the same package path.
+- **No `lib.rs` → `Lib.kt`, no `mod.rs` → `Mod.kt`, no
+  `state_machine.rs` → `StateMachine.kt`.** Rust files named after their
+  module or crate position (the file's name describes where it sits in
+  the tree, not what it defines) split into Kotlin files named after
+  their dominant type. Re-export glue collapses; real implementation
+  re-homes into properly-named files. The `1 .rs → 1 .kt` rule applies
+  only when the Rust file is named after its dominant type. Port-lint
+  headers in the split files all point at the same upstream Rust source
+  path, since multiple Kotlin files derive from one Rust file in this
+  case.
 
 ## Trait default methods with `where` clauses → method-level Kotlin generic bounds
 

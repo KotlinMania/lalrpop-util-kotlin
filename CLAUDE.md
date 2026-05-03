@@ -144,8 +144,14 @@ Warnings indicate the code is wrong. Fix the cause.
   `mem::forget`, `drop_in_place`, `MaybeUninit<T>`, `dyn Trait`) get
   **deleted** in the port. Inline the wrapped value or use the closest
   Kotlin idiom (plain reference, `var`, atomic ref where threaded).
-- **No `mod.rs` → `Mod.kt`.** Re-export glue collapses; real
-  implementation re-homes into properly-named files.
+- **No `lib.rs` → `Lib.kt`, no `mod.rs` → `Mod.kt`, no
+  `state_machine.rs` → `StateMachine.kt`.** Rust files whose name
+  describes where they sit in the module tree rather than what they
+  define split into Kotlin files named after their dominant type. The
+  `1 .rs → 1 .kt` rule applies only when the Rust file's name matches
+  its dominant type. Each Kotlin file derived from a multi-type Rust
+  file carries a `// port-lint: source <same-rust-path>` header
+  pointing at the shared upstream source.
 
 ### Trait default methods with `where` clauses
 
