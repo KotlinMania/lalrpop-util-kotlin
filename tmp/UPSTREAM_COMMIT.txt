@@ -1,0 +1,5 @@
+f67f8741aeb5b78b0d4dc884ee4e6c97b3ac03ed
+f67f8741aeb5b78b0d4dc884ee4e6c97b3ac03ed 2026-03-11 08:49:18 -0400 Bump versions and add changelog for 0.23.1 (#1119)
+
+Cloned from: https://github.com/lalrpop/lalrpop
+Subdirectory: lalrpop-util/

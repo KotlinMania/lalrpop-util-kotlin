@@ -1,0 +1,26 @@
+# Kotlin/Gradle build artifacts
+/build/
+/*/build/
+.gradle/
+local.properties
+
+# Android SDK staged by setup-android-sdk.sh (per-developer, not committed)
+/.android-sdk/
+
+# IDE and editor noise
+*.class
+*.jar
+*.war
+*.ear
+.idea/
+*.iml
+out/
+
+# Keep the Gradle wrapper jar checked in so CI can run `./gradlew`.
+!gradle/wrapper/gradle-wrapper.jar
+
+# Upstream Rust mirror — provisioned by tmp/refresh-upstream.sh, not committed.
+# tmp/UPSTREAM_COMMIT.txt and tmp/refresh-upstream.sh are the only tracked files.
+tmp/lalrpop/
+tmp/lalrpop-util/
+tmp/*.zip
