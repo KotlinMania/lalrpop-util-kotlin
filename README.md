@@ -61,6 +61,17 @@ cd lalrpop-util-kotlin
 
 The build gate is `./gradlew test`. There is no JVM target.
 
+### ast_distance (port-quality scoring, optional)
+
+This project tracks an upstream Rust source mirror in `tmp/lalrpop-util/` and uses [ASTDistance](https://github.com/sydneyrenee/ASTDistance) to score the port. The tool is provisioned per-clone — the `tools/ast_distance/` tree is gitignored and rebuilt from a sibling repo at `../../ASTDistance`:
+
+```bash
+cd ..    # to the kotlinmania root that holds propagate_ast_distance.sh
+./propagate_ast_distance.sh --consumer /Volumes/stuff/Projects/kotlinmania/lalrpop-util-kotlin/tools/ast_distance
+```
+
+Re-run any time you bump the upstream ast_distance source.
+
 ## Relationship to lalrpop-kotlin
 
 ```

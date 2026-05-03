@@ -24,3 +24,9 @@ out/
 tmp/lalrpop/
 tmp/lalrpop-util/
 tmp/*.zip
+
+# ast_distance: the entire tree under tools/ast_distance/ is provisioned by
+# `../propagate_ast_distance.sh` from /Volumes/stuff/Projects/ASTDistance.
+# Nothing under it belongs in this repo's history; bootstrap with
+# `cd .. && ./propagate_ast_distance.sh` after a fresh clone.
+tools/ast_distance/
