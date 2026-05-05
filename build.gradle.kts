@@ -174,3 +174,9 @@ tasks.register("testClasses") {
             (n.endsWith("TestClasses") || n.startsWith("compileTestKotlin"))
     })
 }
+
+tasks.register("test") {
+    description = "Runs the Kotlin Multiplatform test aggregate."
+    group = "verification"
+    dependsOn("allTests")
+}
