@@ -18,8 +18,8 @@ group = "io.github.kotlinmania"
 version = "0.1.0"
 
 // `setup-android-sdk.sh` writes local.properties pointing at .android-sdk/.
-// If the operator already has ANDROID_HOME set, fall back to that path so
-// CI runners with system-installed SDKs continue to work.
+// ANDROID_SDK_ROOT or ANDROID_HOME can provide the SDK path on runners with
+// a system-installed SDK.
 val androidSdkDir: String? =
     providers.environmentVariable("ANDROID_SDK_ROOT").orNull
         ?: providers.environmentVariable("ANDROID_HOME").orNull

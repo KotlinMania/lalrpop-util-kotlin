@@ -164,9 +164,8 @@ member (no `override` keyword); Kotlin resolves to the member for the
 concrete static receiver type and to the extension for the interface
 type, exactly mirroring Rust's per-impl override of a trait default.
 When the bound lives on a *class* parameter rather than a trait method,
-fall back to the `Comparator<in K>` field pattern with a
-comparator-or-natural dispatch helper. See AGENTS.md for the worked
-recipe and rationale.
+use the `Comparator<in K>` field pattern with a comparator-or-natural
+dispatch helper. See AGENTS.md for the worked recipe and rationale.
 
 ### Blast Radius Rule
 
