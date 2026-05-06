@@ -55,12 +55,6 @@ kotlin {
             xcf.add(this)
         }
     }
-    macosX64 {
-        binaries.framework {
-            baseName = "LalrpopUtil"
-            xcf.add(this)
-        }
-    }
     linuxX64()
     mingwX64()
     iosArm64 {
@@ -174,7 +168,13 @@ rootProject.extensions.configure<NodeJsRootExtension>("kotlinNodeJs") {
 
 mavenPublishing {
     publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
-    signAllPublications()
+    val signingConfigured =
+        providers.gradleProperty("signingInMemoryKey").isPresent ||
+            providers.gradleProperty("signing.keyId").isPresent ||
+            providers.environmentVariable("SIGNING_KEY").isPresent
+    if (signingConfigured) {
+        signAllPublications()
+    }
 
     coordinates(group.toString(), "lalrpop-util-kotlin", version.toString())
 

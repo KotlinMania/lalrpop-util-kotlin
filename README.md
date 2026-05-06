@@ -30,7 +30,7 @@ Plus a Kotlin-only adapter layer (`Production`, `ParseTables`, `TableDrivenParse
 
 Kotlin Multiplatform, no JVM. Shipped:
 
-- `macosArm64`, `macosX64`
+- `macosArm64`
 - `linuxX64`
 - `mingwX64`
 - `iosArm64`, `iosX64`, `iosSimulatorArm64`
