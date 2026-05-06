@@ -3,8 +3,30 @@ name: CI
 on:
   push:
     branches: [master, main]
+    paths:
+      - '.github/workflows/ci.yml'
+      - 'build.gradle.kts'
+      - 'gradle.properties'
+      - 'settings.gradle.kts'
+      - 'gradle/**'
+      - 'gradlew'
+      - 'gradlew.bat'
+      - 'setup-android-sdk.sh'
+      - 'src/**'
+      - 'kotlin-js-store/**'
   pull_request:
     branches: [master, main]
+    paths:
+      - '.github/workflows/ci.yml'
+      - 'build.gradle.kts'
+      - 'gradle.properties'
+      - 'settings.gradle.kts'
+      - 'gradle/**'
+      - 'gradlew'
+      - 'gradlew.bat'
+      - 'setup-android-sdk.sh'
+      - 'src/**'
+      - 'kotlin-js-store/**'
 
 jobs:
   build-macos-arm64:

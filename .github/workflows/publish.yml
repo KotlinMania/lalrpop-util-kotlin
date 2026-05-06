@@ -46,6 +46,9 @@ jobs:
           npm --version
           yarn --version
 
+      - name: Provision project-local Android SDK
+        run: ./setup-android-sdk.sh
+
       - name: Build (dry run)
         if: ${{ github.event_name == 'workflow_dispatch' && !inputs.publish }}
         env:
