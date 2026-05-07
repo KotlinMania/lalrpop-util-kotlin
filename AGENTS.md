@@ -1,99 +1,214 @@
-# lalrpop-util-kotlin — agent guide
+# Agent guide - lalrpop-util-kotlin
 
-This repo is the Kotlin Multiplatform port of the upstream Rust
-[`lalrpop-util`](https://crates.io/crates/lalrpop-util) crate. Upstream
-source mirrors into `tmp/lalrpop-util-<rev>/` via
-`tmp/refresh-upstream.sh` and is the **read-only** translation oracle.
-Never edit `tmp/`.
+This file is the quick-reference operating contract for lalrpop-util-kotlin. The longer
+project story lives in `CLAUDE.md`, `README.md`, and any repo-local notes. Read
+those before editing. This guide captures the workspace-wide porting discipline
+that must not drift: Kotlin stays Kotlin, source comments stay Kotlin-facing,
+and required port inventory is done with `ast_distance` when the repo ships it.
 
-## Scope
+## What this repo is
 
-This artifact is the **runtime island** — `ParseError`, `ErrorRecovery`,
-`state_machine::ParserDefinition` + parser driver, the optional
-built-in `lexer::Matcher`, and the small Kotlin-only adapter classes
-(`ParseTables`, `Production`, `TableDriven*`) that the Kotlin-emit
-codegen back-end of `lalrpop-kotlin` builds on top of.
+lalrpop-util-kotlin is a Kotlin Multiplatform port of the upstream Rust crate or module
+[`lalrpop-util`](./README.md). Upstream Rust is the behavioral oracle while the
+repo is still in parity mode. Never edit `tmp/` or any fetched upstream source
+to make the port easier.
 
-The runtime is the leaf of every consumer's dependency graph. Anything
-that pulls in `kotlinx-*`, anything generator-side (parser of `.lalrpop`,
-LR builder, codegen), or anything that grows the artifact size for a
-benefit any single consumer can replicate themselves does **not**
-belong here.
+No JVM-only dependencies, no `java.*` / `javax.*`, no shortcuts through
+established JVM libraries, and no replacing a Cargo dependency with an unrelated
+Kotlin library when a `*-kotlin` sibling port exists or should exist.
 
-## Maven coordinates
+## Project phase
 
-`io.github.kotlinmania:lalrpop-util-kotlin:<version>`
+Check the repo before choosing a workflow.
 
-Package root: `io.github.kotlinmania.lalrpoputil`. Subpackages mirror
-upstream Rust modules:
+- **If `tools/ast_distance/` exists:** the repo is still in parity/porting
+  mode. Drift measurement is required, not optional. Use the repo's
+  `tools/ast_distance` binary/script to identify missing files, missing
+  functions, provenance/header drift, and cheat-detection failures before
+  choosing work and again at file or phase boundaries. Do not chase similarity
+  scores in the middle of translating a half-read file, and never Rustify
+  Kotlin to appease the tool.
+- **If `tools/ast_distance/` does not exist:** the repo has matured past the
+  structural-port phase and is optimizing for idiomatic Kotlin. Work like a
+  Kotlin maintainer: preserve behavior and public API intent, improve Kotlin
+  shape when appropriate, and use the repo's tests/docs as the gate. Do not
+  reintroduce Rust-shaped code or comments.
 
-- `io.github.kotlinmania.lalrpoputil` ← `lalrpop_util` crate root
-  (`ParseError`, `ErrorRecovery`)
-- `io.github.kotlinmania.lalrpoputil.statemachine` ← `lalrpop_util::state_machine`
-- `io.github.kotlinmania.lalrpoputil.lexer` ← `lalrpop_util::lexer`
-- `io.github.kotlinmania.lalrpoputil.tabledriven` ← Kotlin-only auxiliary
-  types (no upstream module; Rust embeds the same data inline as
-  `const __ACTION: &[i16]` arrays in generated source)
+## Required workflow in parity mode
 
-## Port-lint headers
+1. Read `CLAUDE.md`, `README.md`, this file, and any repo-local status files.
+2. Confirm the upstream Rust source is present under the `tmp/` path named by
+   `CLAUDE.md` or `.ast_distance_config.json`. Fetch it using the repo's helper
+   if needed. Never edit it.
+3. If `tools/ast_distance/` exists, run the repo's `ast_distance --deep`
+   workflow before picking work. Use it as the required inventory for unported
+   files/functions and provenance drift.
+4. Pick bottom-up work: dependencies before consumers, leaves before roots.
+5. Read the whole upstream `.rs` file before typing. If the file is too large,
+   split the turn into "read" and "write"; never start from a half-read file.
+6. Keep the mapping one Rust file -> one Kotlin file unless the upstream file is
+   pure `mod.rs` re-export glue covered by the `mod.rs` rules below.
+7. Translate top-to-bottom in upstream order. Preserve declaration order.
+8. Translate comments and docs as content. See "Source comments and KDoc."
+9. Leave hard files visible; do not fill holes with stubs.
+10. After a file lands, run the relevant compile/test gate and, when available,
+    `ast_distance` again.
 
-Every Kotlin file derived from upstream MUST start with:
+## Required workflow in mature Kotlin mode
+
+1. Read the repo-local docs and tests first.
+2. Make idiomatic Kotlin changes that preserve behavior and public API intent.
+3. Remove stale Rust-shaped scaffolding when it is no longer part of the repo's
+   Kotlin design.
+4. Keep comments Kotlin-facing. Historical Rust notes belong in docs, not source
+   comments, unless the repo explicitly keeps a provenance ledger.
+5. Run the repo's normal Gradle/test gates.
+
+## Source comments and KDoc
+
+Comments are content. They are part of the port, not decoration.
+
+- Preserve upstream module docs, KDoc-equivalent sections, inline notes, safety
+  notes, panic/error docs, and upstream TODO/FIXME items by translating them.
+- **No Rust in comments:** KDoc and `//` comments must describe the Kotlin API
+  in Kotlin terms. Translate Rust syntax inside comments to Kotlin equivalents:
+  `Vec<T>` -> `List<T>`, `Option<&str>` -> `String?`, `Self::foo()` -> `foo()`,
+  `snake_case` function names -> `lowerCamelCase`, Rust lifetimes disappear,
+  `cfg(test)` / `#[derive(...)]` become prose when relevant.
+- **Do not Rustify Kotlin:** this is a translation direction, not a renaming
+  scheme. Never rename Kotlin files, packages, functions, locals, parameters,
+  or identifiers to `snake_case` to match upstream. Kotlin source stays Kotlin.
+- **No porting narratives in source:** do not add comments explaining Kotlin
+  workarounds, "Rust vs Kotlin" rationale, ast_distance strategy, or translation
+  decisions. Put those in `CLAUDE.md`, `NEXT_ACTIONS.md`, commit messages, or
+  review notes.
+- Source comments should be upstream comments translated into Kotlin-facing API
+  names/signatures, plus required provenance/license headers and required
+  migration ledgers such as the `mod.rs` ledger below.
+- If `ast_distance` zeros a file because Rust syntax leaked into Kotlin source
+  code or comments, treat that as a literal instruction to make the Kotlin
+  source Kotlin-native.
+
+## Provenance headers
+
+In parity mode, every Kotlin file translated from a Rust source file starts with
+the repo's `port-lint` source header before the package line:
 
 ```kotlin
-// port-lint: source <path-relative-to-tmp/lalrpop-util/>
-package io.github.kotlinmania.lalrpoputil.<module>
+// port-lint: source <path-relative-to-upstream-root>
+package <repo package>
 ```
 
-Example:
+Use the path convention from `CLAUDE.md` or `.ast_distance_config.json`. Do not
+invent absolute upstream paths. If a repo requires an attribution line after the
+`port-lint` header, preserve it exactly.
 
-```kotlin
-// port-lint: source src/state_machine.rs
-package io.github.kotlinmania.lalrpoputil.statemachine
-```
+For files with no single Rust counterpart, use `// port-lint: ignore` only when
+repo docs allow it, and add the shortest possible upstream-derived or ledger
+note. Do not use ignored files as a place for translation rationale.
 
-Path is relative to `tmp/lalrpop-util-<rev>/`. This is how `ast_distance`
-tracks provenance.
+## Naming
 
-For Kotlin-only auxiliary files use:
+The translation direction is always Rust -> Kotlin.
 
-```kotlin
-// port-lint: ignore — Kotlin-only adapter (no upstream counterpart;
-//                    Rust embeds equivalent data inline in generated source)
-package io.github.kotlinmania.lalrpoputil.tabledriven
-```
+| Thing | Kotlin form |
+|---|---|
+| Files and types | `PascalCase` |
+| Functions, properties, parameters, locals | `lowerCamelCase` |
+| Interfaces | `PascalCase`, no `I` prefix |
+| `const val`, enum entries, true constants | `SCREAMING_SNAKE_CASE` allowed |
+| Type parameters | `T`, `K`, `V`, or meaningful `PascalCase` when clearer |
+| Packages | lowercase, no underscores, no camelCase |
 
-## Translation discipline
+Examples:
 
-These are line-by-line **transliterations**. Read the Rust file end to
-end, then port. Don't reorder, summarize, or "improve."
+| Rust source | Kotlin port |
+|---|---|
+| `fn first_key_value` | `fun firstKeyValue` |
+| `let len_underflow` | `val lenUnderflow` |
+| `const FOO_BAR: usize = 5` | `const val FOO_BAR: Int = 5` |
+| `src/foo_bar.rs` | `FooBar.kt` |
 
-- **Doc comments translate word-for-word.** Rust syntax inside KDoc
-  (`Vec<T>`, `Option<&str>`, `Self::foo()`, lifetimes, `cfg(test)`,
-  `#[derive(...)]`) gets rewritten to its Kotlin equivalent (`List<T>`,
-  `String?`, `foo()`, KDoc links). Translate the code-in-comment; never
-  delete the comment to silence a rule.
-- **No no-op shells.** Rust constructs the GC subsumes (`Box<T>`,
-  `Cell<T>`, `RefCell<T>`, `Arc<T>`, `Rc<T>`, `Pin`, `mem::forget`,
-  `drop_in_place`, `MaybeUninit<T>`, `dyn Trait`) get **deleted** in
-  the port. Inline the wrapped value or use the closest Kotlin idiom.
-  Empty shells inflate symbol counts without porting any behavior.
-- **Tests live in `commonTest`.** Inline `#[cfg(test)] mod tests` blocks
-  port to `commonTest` mirroring the same package path.
-- **No `lib.rs` → `Lib.kt`, no `mod.rs` → `Mod.kt`, no
-  `state_machine.rs` → `StateMachine.kt`.** Rust files named after their
-  module or crate position (the file's name describes where it sits in
-  the tree, not what it defines) split into Kotlin files named after
-  their dominant type. Re-export glue collapses; real implementation
-  re-homes into properly-named files. The `1 .rs → 1 .kt` rule applies
-  only when the Rust file is named after its dominant type. Port-lint
-  headers in the split files all point at the same upstream Rust source
-  path, since multiple Kotlin files derive from one Rust file in this
-  case.
+## Rust -> Kotlin mapping defaults
 
-## Trait default methods with `where` clauses → method-level Kotlin generic bounds
+Repo-local rules in `CLAUDE.md` may narrow these, but do not invent new shapes
+without documenting the rule in project docs.
 
-Rust traits routinely declare a default method whose body only
-typechecks when the type parameter satisfies a stricter bound:
+| Rust | Kotlin |
+|---|---|
+| `Option<T>` | `T?` |
+| `Result<T, E>` | `Result<T>` when `E` is not modeled; sealed result or exception when error data/behavior matters |
+| `Vec<T>` | `MutableList<T>` / `List<T>` |
+| `HashMap<K, V>` | `MutableMap<K, V>` / `Map<K, V>` |
+| `HashSet<T>` | `MutableSet<T>` / `Set<T>` |
+| `BTreeMap<K, V>` | `BTreeMap`/sorted map from `btree-kotlin`; do not use JVM-only `TreeMap` in common code |
+| `&T`, `&mut T` | regular Kotlin reference; mutate through the owning object |
+| `*const T`, `*mut T`, `NonNull<T>` | regular Kotlin reference unless native interop is explicitly required |
+| `Box<T>` | bare `T` |
+| `Rc<T>`, `Arc<T>` | bare `T` reference unless shared concurrency semantics must be modeled |
+| `Cell<T>`, `RefCell<T>` | `var`; use multiplatform atomics only for real shared mutation |
+| `PhantomData<T>` | drop field; encode variance with `in` / `out` when needed |
+| `MaybeUninit<T>` | nullable slot/array plus local invariant, or a typed initialization helper |
+| `ManuallyDrop<T>` | omit unless drop side effects are observable |
+| `mem::replace`, `take_mut` | read old value, compute new value, assign back; return side result explicitly |
+| `ptr::read`, `ptr::write` | direct field/slot access |
+| `ptr::drop_in_place` | omit unless observable drop behavior is being modeled |
+| `mem::transmute` | verified cast or explicit conversion; no shim that hides the invariant |
+| `dyn Trait` | interface reference |
+| trait | `interface` |
+| trait default method with `where` | extension function carrying its own bound |
+| class/impl generic bound such as `K: Ord` | `Comparable` bound or `Comparator<in K>` field/dispatch helper |
+| struct with fields | `data class` when value semantics fit; otherwise `class` |
+| enum with payload variants | `sealed class` / `sealed interface` |
+| `pub fn foo()` | `fun foo()`; public is default |
+| `pub(crate)` / `pub(super)` | `internal` |
+| private `fn foo()` | `private fun foo()` |
+| `let` / `let mut` | `val` / `var` |
+| `match` | `when` |
+| `if let Some(v) = x` | nullable handling such as `x?.let { v -> ... }` |
+| `?` operator | explicit early return, `Result` transform, or throw according to the mapped error shape |
+| `unsafe { ... }` | regular Kotlin code; keep only upstream comments translated to Kotlin-facing terms |
+| `proc-macro` derive | explicit Kotlin codegen/runtime API; never silently elide behavior |
+| `pub type X = Y` | `typealias X = Y` only when upstream really defines a type alias and it is not a re-export bridge |
+| `impl Iterator for X` | class implementing `Iterator<T>` or `MutableIterator<T>` as appropriate |
+
+## Required `mod.rs` / re-export workflow
+
+Pure upstream `mod.rs` re-export glue must not become a Kotlin central-alias API.
+This rule is required.
+
+When an upstream Rust `mod.rs` only re-exports something that actually lives
+elsewhere, such as `pub use <crate-path>::<Name>;`, often under a different
+name:
+
+1. Identify the original symbol's fully qualified upstream path and the exported
+   name.
+2. Search dependent Kotlin callers across the kotlinmania monorepo. A caller is
+   a Kotlin file in another `*-kotlin` repo with a `tmp/` source tree and a
+   Cargo.toml depending on this crate's Rust counterpart. Search for direct
+   imports, wildcard imports plus body usage, and fully qualified references.
+3. Rewrite callers to reference the original/defining Kotlin symbol directly.
+   If the call site must keep the old spelling, use Kotlin import aliasing:
+   `import <defining.package.Symbol> as <Name>`.
+4. Never bridge a pure re-export with a Kotlin `typealias` at a root or
+   re-export package.
+5. Keep `Mod.kt` or the equivalent package file as a tracking ledger when the
+   upstream file carries module docs or re-export history. It should contain the
+   translated upstream module-level comments and literal quoted `pub use` lines,
+   for example `// pub use crate::lib::result::Result;`.
+6. Each time a caller is migrated off the re-export, append that caller's
+   absolute path under a `// Callers migrated:` ledger. Append; do not delete
+   migration history.
+7. Once all callers are migrated, remove any temporary bridge alias. The ledger
+   file remains as the record of the migration.
+
+If a `mod.rs` contains real implementation rather than pure re-export glue,
+translate the implementation into the appropriate Kotlin file/package shape
+named by repo docs.
+
+## Trait defaults with `where` clauses
+
+Rust traits often put stricter bounds on a default method than on the trait:
 
 ```rust
 pub trait RangeBounds<T> {
@@ -101,28 +216,18 @@ pub trait RangeBounds<T> {
     fn end_bound(&self) -> Bound<&T>;
 
     fn is_empty(&self) -> bool
-    where T: PartialOrd,
-    { /* default body uses < */ }
+    where
+        T: PartialOrd,
+    { /* default body */ }
 }
 ```
 
-The trait stays unconstrained; the *method* picks up the bound via its
-own `where` clause. Kotlin has no per-method `where` on an interface
-member. Three obvious mappings fail:
+Do not tighten the whole Kotlin interface to `T : Comparable<T>`. Do not make
+the method abstract just to satisfy Kotlin. Do not use runtime comparable casts
+that turn Rust compile-time bounds into Kotlin runtime crashes.
 
-1. **Tighten the interface to `<T : Comparable<T>>`.** Breaks every
-   caller that holds the unbounded interface type.
-2. **Make the method abstract on the interface.** Forces every concrete
-   impl to invent a body and pile on `override` boilerplate, even when
-   the Rust counterpart inherits the default unchanged.
-3. **Runtime cast helper** — `if (left is Comparable<*> ...) ... else throw IllegalStateException(...)`.
-   Compile-time bounds become runtime crashes; the cheat detector flags
-   this and zeros the file's score.
-
-### The faithful pattern
-
-Translate the default to a Kotlin **extension function whose own type
-parameter carries the bound**:
+Translate the default to an extension function whose own type parameter carries
+the bound:
 
 ```kotlin
 interface RangeBounds<T> {
@@ -130,89 +235,134 @@ interface RangeBounds<T> {
     fun endBound(): Bound<T>
 }
 
-fun <T : Comparable<T>> RangeBounds<T>.isEmpty(): Boolean { /* default body */ }
+fun <T : Comparable<T>> RangeBounds<T>.isEmpty(): Boolean {
+    // translated default body
+}
 ```
 
-Concrete impls that want to specialise the default supply a same-named
-**member function**. Kotlin resolves `range.isEmpty()` to the member
-when the static receiver type is the concrete class and to the
-extension when it is the interface — exactly mirroring Rust's
-"default method, per-impl override". No `override` keyword on the
-member; there is nothing on the interface to override.
+Concrete implementations that specialize the default provide a same-named
+member function without `override`; Kotlin member resolution mirrors Rust's
+per-impl specialization of a default method.
 
-When the bound lives on a *class* parameter (e.g. `impl<K: Ord> Map<K, V>`),
-Kotlin has no method-level analog — class type parameters bind for the
-whole class. Use the `Comparator<in K>` field pattern with a
-`compareKeys(a, b)` dispatch helper that prefers the supplied
-comparator and falls back to a `Comparable<K>`-based path.
+When both comparator-aware and natural-order paths are needed, put the heavy
+logic in an unbounded overload that takes a comparator explicitly, then add a
+bounded one-line natural-order overload:
 
-## Code discipline
+```kotlin
+internal fun <K, Q> search(key: Q, compare: (K, Q) -> Int): Hit {
+    // heavy lifting
+}
 
-- **No `@Suppress`.** Warnings are errors. Fix the cause.
-- **No stubs.** No `TODO()`, no `error("not implemented")`, no empty
-  class bodies on types that have fields and methods.
-- **No JVM imports.** No `kotlin.jvm.*`, no `java.*`, no `javax.*`.
-- **No third-party dependencies.** This is the runtime that every
-  generated parser ships against. Every dependency added here cascades
-  to every downstream consumer of every generated parser. Raise on
-  Slack before adding any.
+internal fun <K, Q : Comparable<Q>> search(key: Q): Hit where K : Comparable<Q> =
+    search(key) { stored, query -> stored.compareTo(query) }
+```
 
-## Blast radius
+## Other recurring porting patterns
 
-- No repo-wide scripting (`find -exec`, blanket `sed`/`perl`, regex over
-  many files).
-- Changes are task-scoped, not pattern-scoped. Every touched file is
-  named up front.
-- Small multi-file changes are allowed when mechanically coupled —
-  primary file plus its `commonTest` and any required call-site
-  rewires.
-- No drive-by refactors, renames, or formatting churn.
+- `Ordering::{Less, Equal, Greater}` maps to Kotlin comparator `Int` convention:
+  negative, zero, positive. Do not introduce an `Ordering` enum unless repo docs
+  require it.
+- Rust `Iterator::next() -> Option<T>` maps to Kotlin `hasNext()` plus `next()`.
+  Cache the next value once; do not advance twice.
+- `ExactSizeIterator` has no Kotlin equivalent. Pass the known size explicitly
+  when an algorithm needs it.
+- `FusedIterator` is implicit: after `hasNext()` becomes false, keep it false.
+- Rust `Peekable<I>` maps to a small private one-element lookahead adapter.
+- Sum enums used only to tag iterator side/source can map to nullable slots plus
+  an explicit discriminator enum; the discriminator is the source of truth.
+- Same-name Rust impl methods that differ only by typestate marker often erase
+  to the same Kotlin/JVM signature. Use typed routers and distinct Kotlin names
+  for erased collisions; do not use `@JvmName`, JVM imports, unchecked casts, or
+  fake typealiases to force the Rust layout.
+- Most Rust `Drop` impls disappear under Kotlin GC. If upstream tests observe
+  drop/clone side effects, model them deterministically with narrow internal
+  hooks and prove the behavior with ported tests. Do not rely on GC timing.
+- Rust iterator `Clone` often has no Kotlin equivalent. Omit cloneability unless
+  behavior requires it; represent `Debug` as `toString()` when useful.
+- Rust trait specialization (`default fn`) has no direct Kotlin equivalent.
+  Prefer explicit dispatch helpers or documented runtime type checks at the
+  narrow call site.
+- Compile-time-incomplete files are acceptable only in early parity phases when
+  they contain no fake stubs and the missing dependencies are tracked. Missing
+  symbols are better than placeholder classes that conflict with the real port.
 
-## Verification
+## Dependencies
 
-The build gate is **`./gradlew test`**.
+Approved common dependencies, when the repo already uses or needs them:
+
+- `kotlinx-coroutines-core`
+- `kotlinx-serialization-core`
+- `kotlinx-serialization-json`
+- `kotlinx-collections-immutable`
+- `kotlinx-datetime`
+- `kotlinx-io`
+- `com.ionspin.kotlin:bignum` only when numeric behavior requires it
+- `io.github.kotlinmania:*-kotlin` sibling ports for Rust transitive deps
+
+Add a dependency only when stdlib plus approved siblings cannot reproduce the
+behavior, and only after confirming it publishes artifacts for every target this
+repo ships. If the Rust crate has no KMP equivalent, port that crate instead of
+leaving a TODO or using a JVM-only shortcut.
+
+## Forbidden
+
+- Rust syntax leaking into Kotlin code or comments.
+- Rustifying Kotlin names, files, packages, or API shape to improve similarity.
+- `@Suppress(...)` unless a repo-local doc already records a narrow, reviewed
+  invariant that Kotlin cannot encode. New suppressions require discussion.
+- `TODO()`, `error("not implemented")`, empty shells, fake implementations, or
+  placeholder bodies.
+- Re-export `typealias` bridges for upstream `mod.rs` glue.
+- `import kotlin.jvm.*`, `java.*`, or `javax.*` from shared/common source.
+- JVM-only annotations such as `@JvmName`, `@JvmStatic`, `@JvmField`, or
+  `@JvmOverloads` in common code.
+- Repo-wide source rewrites with global `sed`/`perl`/`find -exec`. Source edits
+  are task-scoped and reviewed.
+- Bulk-editing source comments. Comment changes are intentional translation
+  work and must be reviewed as such.
+- Subagent-driven `.kt` edits. Translation happens in the main loop so mistakes
+  are visible immediately.
+
+## Tests and gates
+
+Use the repo's documented Gradle tasks. Common gates include:
 
 ```bash
+./gradlew test
 ./gradlew macosArm64Test
 ./gradlew linuxX64Test
 ./gradlew jsNodeTest
 ./gradlew wasmJsNodeTest
 ```
 
-`./gradlew jvmTest` is **not** valid — there is no JVM target.
+In parity repos with `tools/ast_distance/`, also run the repo's deep scan, for
+example:
 
-## Approved dependencies
+```bash
+./tools/ast_distance/ast_distance --deep <upstream-root> rust <kotlin-source-root> kotlin
+```
 
-**None at present.** Pure Kotlin stdlib only.
+The exact paths come from `.ast_distance_config.json`, `CLAUDE.md`, or existing
+repo scripts. Use this scan as a progress dashboard for missing files/functions,
+header drift, and cheat detection. A file is not done merely because a
+similarity score looks good; it is done when the behavior is ported and the
+relevant tests pass.
 
-## Dependents
+Port tests too. Rust `#[test]` becomes Kotlin `@Test`. Test utilities needed by
+ported upstream tests belong in `src/commonTest`, not `commonMain`, unless the
+upstream behavior is truly public runtime behavior.
 
-Downstream Kotlin consumers (must stay on a published version of this
-artifact, never composite/include-build):
+## Scope and commits
 
-- `lalrpop-kotlin` — the parser generator. Its bootstrap parser, build
-  driver, and Kotlin-emit codegen all import runtime types.
-- `starlark-syntax-kotlin` — consumes the generated `StarlarkParser.kt`
-  + this runtime when the Kotlin-emit backend lands.
-- `starlark-lsp-kotlin` (future) — same shape.
+- More than about five source files in one change is usually too much; stop and
+  ask unless the user explicitly requested a mechanical sweep.
+- Commit at file or coherent phase boundaries.
+- Commit messages are clear and human: no AI branding, no "Generated with"
+  footers, no robot attribution, no `Co-Authored-By` lines unless the human asks.
 
-## Subagent policy
+## When unsure
 
-Do not delegate `.kt` writes to subagents. Subagents cheat on
-translation: hollow out KDoc, drop semantically load-bearing
-constructs, produce confident summaries that mask damage. Search and
-read-only reports via subagents are fine. Edits happen in the main
-loop.
-
-## Commit style
-
-No AI branding, no Co-Authored-By lines, no emoji. Clear, descriptive
-messages focused on what changed and why. One file → one commit; squash
-later via `git rebase -i` for logical units.
-
-## Maintainer
-
-Sydney Renee &lt;sydney@solace.ofharmony.ai&gt;,
-The Solace Project (KotlinMania org).
-
-Discussion: [Solace Project Discord](https://discord.gg/rJqVeSmx4).
+Read upstream again. Read the repo-local `CLAUDE.md` again. If a construct is
+not covered here, add the rule to project docs with the translation you chose.
+The goal is not to make Kotlin look like Rust; the goal is to preserve behavior
+while moving steadily toward Kotlin that Kotlin developers can maintain.
