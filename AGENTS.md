@@ -167,7 +167,6 @@ comparator and falls back to a `Comparable<K>`-based path.
   primary file plus its `commonTest` and any required call-site
   rewires.
 - No drive-by refactors, renames, or formatting churn.
-- More than ~5 files in a single change? Stop and ask.
 
 ## Verification
 
