@@ -58,7 +58,7 @@ runs Gradle itself; it does not add a JVM target.
 - `macosArm64`
 - `linuxX64`
 - `mingwX64`
-- `iosArm64`, `iosX64`, `iosSimulatorArm64`
+- `iosArm64`, `iosSimulatorArm64`
 - `js` (browser + nodejs)
 - `wasmJs` (browser + nodejs)
 - `androidLibrary`
