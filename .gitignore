@@ -2,6 +2,7 @@
 /build/
 /*/build/
 .gradle/
+.kotlin/
 local.properties
 
 # Android SDK staged by setup-android-sdk.sh (per-developer, not committed)

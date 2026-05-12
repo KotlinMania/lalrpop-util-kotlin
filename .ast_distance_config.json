@@ -2,7 +2,7 @@
   "type": "port",
   "name": "lalrpop-util-kotlin",
   "source": {
-    "path": "tmp/lalrpop-util",
+    "path": "tmp/lalrpop-util/src",
     "lang": "rust"
   },
   "target": {

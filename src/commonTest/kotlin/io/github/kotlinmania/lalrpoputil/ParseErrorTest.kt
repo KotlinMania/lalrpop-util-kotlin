@@ -12,7 +12,7 @@ import kotlin.test.assertEquals
  */
 class ParseErrorTest {
     @Test
-    fun unrecognizedTokenDisplay() {
+    fun test() {
         val err: ParseError<Int, String, String> = ParseError.UnrecognizedToken(
             token = Triple(1, "t0", 2),
             expected = listOf("t1", "t2", "t3"),
