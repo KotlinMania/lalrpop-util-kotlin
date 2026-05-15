@@ -31,3 +31,4 @@ tmp/*.zip
 # Nothing under it belongs in this repo's history; bootstrap with
 # `cd .. && ./propagate_ast_distance.sh` after a fresh clone.
 tools/ast_distance/
+.DS_Store
