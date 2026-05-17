@@ -12,12 +12,12 @@
 #   5. Write local.properties to point at the project-local SDK.
 #
 # The .android-sdk/ tree is gitignored. Re-run this script after a clean clone
-# or when the SDK layout drifts. It is idempotent — completed steps are skipped.
+# or when the SDK layout drifts. It is idempotent - completed steps are skipped.
 #
 # Override defaults via env vars:
-#   CMDLINETOOLS_REV — Google's commandlinetools build number (default below).
-#   COMPILE_SDK       — Android API level to install (default: read from build.gradle.kts).
-#   BUILD_TOOLS       — Build-tools version to install (default below).
+#   CMDLINETOOLS_REV - Google's commandlinetools build number (default below).
+#   COMPILE_SDK       - Android API level to install (default: read from build.gradle.kts).
+#   BUILD_TOOLS       - Build-tools version to install (default below).
 
 set -euo pipefail
 
@@ -69,7 +69,7 @@ SDKMANAGER="$SDK_DIR/cmdline-tools/latest/bin/sdkmanager"
 # ---------------------------------------------------------------------------
 # The first run prompts y/n for each unaccepted license. `yes |` answers them
 # all. Subsequent runs are no-ops. License acceptance is recorded as hash
-# files under <sdk>/licenses/ — committing those would let CI skip this step,
+# files under <sdk>/licenses/ - committing those would let CI skip this step,
 # but we keep them out of git so each developer accepts their own.
 echo "setup-android-sdk: accepting licenses"
 # `yes |` would work but exits with SIGPIPE (status 141) once sdkmanager
@@ -102,4 +102,4 @@ echo "sdk.dir=$SDK_DIR" > "$REPO_ROOT/local.properties"
 echo
 echo "setup-android-sdk: done"
 echo "  SDK at:     $SDK_DIR"
-echo "  configured: local.properties → $SDK_DIR"
+echo "  configured: local.properties -> $SDK_DIR"
