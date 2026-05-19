@@ -1,6 +1,6 @@
 # port-lint Proposed Changes
 
-**Generated:** 2026-05-07
+**Generated:** 2026-05-19
 **Source:** tmp/lalrpop-util/src
 **Target:** src/commonMain/kotlin/io/github/kotlinmania/lalrpoputil
 
