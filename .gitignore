@@ -1,34 +1,49 @@
 # Kotlin/Gradle build artifacts
-/build/
-/*/build/
+build/
 .gradle/
 .kotlin/
-local.properties
-
-# Android SDK staged by setup-android-sdk.sh (per-developer, not committed)
-/.android-sdk/
-
-# IDE and editor noise
 *.class
 *.jar
 *.war
 *.ear
-.idea/
-*.iml
-out/
 
 # Keep the Gradle wrapper jar checked in so CI can run `./gradlew`.
 !gradle/wrapper/gradle-wrapper.jar
 
-# Upstream Rust mirror — provisioned by tmp/refresh-upstream.sh, not committed.
-# tmp/UPSTREAM_COMMIT.txt and tmp/refresh-upstream.sh are the only tracked files.
-tmp/lalrpop/
-tmp/lalrpop-util/
-tmp/*.zip
+# IDE
+.idea/
+*.iml
+out/
 
-# ast_distance: the entire tree under tools/ast_distance/ is provisioned by
-# `../propagate_ast_distance.sh` from /Volumes/stuff/Projects/ASTDistance.
-# Nothing under it belongs in this repo's history; bootstrap with
-# `cd .. && ./propagate_ast_distance.sh` after a fresh clone.
-tools/ast_distance/
+# Upstream Rust source — clone freshly when porting begins
+tmp/
+!tmp/.gitkeep
+
+# AST distance reports and binaries
+port_status_report.md
+high_priority_ports.md
+ast_distance_*.txt
+.cache/
+*.lock
+kotlin-js-store/*
+!kotlin-js-store/package.json
+!kotlin-js-store/yarn.lock
+!kotlin-js-store/wasm/
+!kotlin-js-store/wasm/yarn.lock
+tools/ast_distance/ast_distance
+tools/ast_distance/build/
+
+# JVM heap dumps
+*.hprof
+java_pid*.hprof
+
+# macOS Finder metadata
 .DS_Store
+
+# Python bytecode
+__pycache__/
+*.pyc
+
+# Android SDK
+/.android-sdk/
+local.properties
