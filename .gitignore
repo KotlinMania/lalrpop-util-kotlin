@@ -2,7 +2,10 @@
 build/
 .gradle/
 .gradle-user-home/
+.gradle-tmp/
 .kotlin/
+.konan/
+.android-home/
 .yarn-cache/
 *.class
 *.jar
