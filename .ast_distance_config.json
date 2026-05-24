@@ -1,6 +1,5 @@
 {
   "type": "maintenance",
-  "parity_mode": false,
   "name": "lalrpop-util-kotlin",
   "source": {
     "path": "tmp/lalrpop-util/src",
