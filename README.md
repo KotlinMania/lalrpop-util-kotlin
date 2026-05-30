@@ -91,7 +91,7 @@ You **really** should read `CONTRIBUTING.md` if you intend to change LALRPOP's o
 
 ```kotlin
 dependencies {
-    implementation("io.github.kotlinmania:lalrpop-util-kotlin:0.1.0")
+    implementation("io.github.kotlinmania:lalrpop-util-kotlin:0.1.1")
 }
 ```
 
