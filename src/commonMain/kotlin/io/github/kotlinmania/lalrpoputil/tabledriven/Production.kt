@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: Apache-2.0 OR MIT
-// port-lint: ignore — Kotlin-only data class used by the Kotlin-emit
-// codegen back-end. Upstream emits each production as inline Rust code in
-// the generated parser (a `__reduceN` function). The Kotlin-emit back-end
-// instead emits a `Production` instance per rule, so the table-driven driver
-// can dispatch reductions data-driven instead of through hundreds of
-// individual functions.
+// Kotlin-only data class used by the Kotlin-emit codegen back-end. Upstream
+// emits each production as inline Rust code in the generated parser (a
+// `__reduceN` function). The Kotlin-emit back-end instead emits a
+// `Production` instance per rule, so the table-driven driver can dispatch
+// reductions data-driven instead of through hundreds of individual
+// functions.
 package io.github.kotlinmania.lalrpoputil.tabledriven
 
 /**
@@ -13,18 +13,18 @@ package io.github.kotlinmania.lalrpoputil.tabledriven
  * The data-driven generated parser declares one [Production] per grammar
  * rule, holding:
  *
- * - `nonterminalId` — index used by the GOTO table to find the next state
+ * - `nonterminalId` - index used by the GOTO table to find the next state
  *   after the production reduces.
- * - `rhsLength` — how many stack entries the production pops before invoking
+ * - `rhsLength` - how many stack entries the production pops before invoking
  *   [action].
- * - `action` — typed lambda that consumes the popped span [start..end] and
+ * - `action` - typed lambda that consumes the popped span [start]..[end] and
  *   the popped stack entries, and returns the symbol to push for the
  *   produced nonterminal.
  *
  * The action lambda receives the [ParseStack] and is expected to call
  * [ParseStack.pop] the appropriate number of times in the order the rule's
  * RHS lists. Returning a typed `S` (the per-grammar `Symbol` sealed class)
- * means there is no `Any` payload — the compiler enforces that the produced
+ * means there is no `Any` payload - the compiler enforces that the produced
  * symbol is one of the declared variants.
  */
 class Production<S, L>(
@@ -34,9 +34,9 @@ class Production<S, L>(
 )
 
 /**
- * A production action — typed lambda contract.
+ * A production action - typed lambda contract.
  *
- * Defined as a `fun interface` rather than a plain `(…) -> Result<S>`
+ * Defined as a `fun interface` rather than a plain `(T) -> Result<S>`
  * function type so the generated tables can name the parameters at the call
  * site, which makes generated action bodies easier to read in stack traces
  * and IDE tooltips.
