@@ -138,10 +138,9 @@ sealed class ParseError<L, T, E> {
     /**
      * The static description string upstream returns from
      * `core::error::Error::description`. The upstream method is deprecated;
-     * the description is kept here as a parity-preserving property.
+     * the description is kept here as a parity-preserving method.
      */
-    val description: String
-        get() = "parse error"
+    fun description(): String = "parse error"
 
     companion object {
         /** Wraps a custom error into a [ParseError.User]. */
