@@ -1,6 +1,6 @@
 # Code Port - Progress Report
 
-**Generated:** 2026-05-19
+**Generated:** 2026-08-28
 **Source:** tmp/lalrpop-util/src
 **Target:** src/commonMain/kotlin/io/github/kotlinmania/lalrpoputil
 
