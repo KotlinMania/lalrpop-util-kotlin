@@ -24,15 +24,23 @@ package io.github.kotlinmania.lalrpoputil.tabledriven
  */
 class TableDrivenLr1Driver<S, L>(
     private val tables: ParseTables<S, L>,
-    private val tokens: Iterator<TerminalToken<S, L>>,
+    tokens: Iterable<TerminalToken<S, L>>,
     private val eofLocation: L,
 ) {
+    private val tokenIterator: Iterator<TerminalToken<S, L>> = tokens.iterator()
+
+    constructor(
+        tables: ParseTables<S, L>,
+        tokens: Iterator<TerminalToken<S, L>>,
+        eofLocation: L,
+    ) : this(tables, Iterable { tokens }, eofLocation)
+
     private val stateStack: ArrayDeque<Int> = ArrayDeque<Int>().apply { addLast(0) }
     private val symbolStack: ParseStack<S, L> = ParseStack(initialCapacity = 32)
 
     /** Drive the parser until accept, error, or end of token stream. */
     fun parse(): ParseOutcome<S, L> {
-        var lookahead: TerminalToken<S, L>? = if (tokens.hasNext()) tokens.next() else null
+        var lookahead: TerminalToken<S, L>? = if (tokenIterator.hasNext()) tokenIterator.next() else null
 
         while (true) {
             val topState = stateStack.last()
@@ -61,7 +69,7 @@ class TableDrivenLr1Driver<S, L>(
                         ?: error("driver shifted on EOF — table compiled wrong at state $topState")
                     symbolStack.push(tok.start, tok.symbol, tok.end)
                     stateStack.addLast(targetState)
-                    lookahead = if (tokens.hasNext()) tokens.next() else null
+                    lookahead = if (tokenIterator.hasNext()) tokenIterator.next() else null
                 }
 
                 rawAction < 0 -> {
