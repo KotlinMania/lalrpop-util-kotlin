@@ -43,7 +43,7 @@ import io.github.kotlinmania.lalrpoputil.statemachine.SimulatedReduce
  *                                `i32` integral-indices implementation.
  * - `Success = S`              — the start production's produced symbol.
  */
-class TableDrivenParserDefinition<S, L, T, E>(
+class TableDrivenParserDefinition<S, L, T, E> internal constructor(
     private val tables: ParseTables<S, L>,
     /** Maps a lexer token to its terminal id, or `null` if unrecognized. */
     private val tokenToTerminalId: (T) -> Int?,

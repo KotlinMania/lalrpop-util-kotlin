@@ -32,7 +32,7 @@ package io.github.kotlinmania.lalrpoputil.tabledriven
  * rule. Reducing by that production ends the parse and returns the produced
  * symbol as the result.
  */
-class ParseTables<S, L>(
+class ParseTables<S, L> internal constructor(
     val numStates: Int,
     val numTerminals: Int,
     val numNonterminals: Int,
@@ -42,7 +42,7 @@ class ParseTables<S, L>(
     val productions: List<Production<S, L>>,
     val acceptProductionId: Int,
 ) {
-    constructor(
+    internal constructor(
         numStates: Int,
         numTerminals: Int,
         numNonterminals: Int,
