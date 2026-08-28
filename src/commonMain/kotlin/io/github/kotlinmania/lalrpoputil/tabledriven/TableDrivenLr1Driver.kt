@@ -22,14 +22,14 @@ package io.github.kotlinmania.lalrpoputil.tabledriven
  * against the sealed `Symbol` hierarchy via the same reified-pop machinery
  * action lambdas use.
  */
-class TableDrivenLr1Driver<S, L>(
+class TableDrivenLr1Driver<S, L> internal constructor(
     private val tables: ParseTables<S, L>,
     tokens: Iterable<TerminalToken<S, L>>,
     private val eofLocation: L,
 ) {
     private val tokenIterator: Iterator<TerminalToken<S, L>> = tokens.iterator()
 
-    constructor(
+    internal constructor(
         tables: ParseTables<S, L>,
         tokens: Iterator<TerminalToken<S, L>>,
         eofLocation: L,
