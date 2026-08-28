@@ -39,9 +39,28 @@ class ParseTables<S, L>(
     val action: ShortArray,
     val eofAction: ShortArray,
     val goto: ShortArray,
-    val productions: Array<Production<S, L>>,
+    val productions: List<Production<S, L>>,
     val acceptProductionId: Int,
 ) {
+    constructor(
+        numStates: Int,
+        numTerminals: Int,
+        numNonterminals: Int,
+        action: ShortArray,
+        eofAction: ShortArray,
+        goto: ShortArray,
+        productions: Array<Production<S, L>>,
+        acceptProductionId: Int,
+    ) : this(
+        numStates = numStates,
+        numTerminals = numTerminals,
+        numNonterminals = numNonterminals,
+        action = action,
+        eofAction = eofAction,
+        goto = goto,
+        productions = productions.toList(),
+        acceptProductionId = acceptProductionId,
+    )
     init {
         require(action.size == numStates * numTerminals) {
             "action table size ${action.size} != $numStates * $numTerminals"
