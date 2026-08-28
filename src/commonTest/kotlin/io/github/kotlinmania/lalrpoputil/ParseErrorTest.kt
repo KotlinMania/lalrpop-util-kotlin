@@ -108,6 +108,6 @@ class ParseErrorTest {
     @Test
     fun descriptionIsParseError() {
         val err: ParseError<Int, String, String> = ParseError.InvalidToken(location = 0)
-        assertEquals("parse error", err.description)
+        assertEquals("parse error", err.description())
     }
 }
