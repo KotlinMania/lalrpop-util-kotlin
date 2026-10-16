@@ -1,9 +1,12 @@
 // SPDX-License-Identifier: Apache-2.0 OR MIT
-// port-lint: source src/lexer.rs
+// port-lint: source lexer.rs
 package io.github.kotlinmania.lalrpoputil.lexer
 
 import io.github.kotlinmania.lalrpoputil.ParseError
 import io.github.kotlinmania.lalrpoputil.statemachine.TokResult
+
+/** The item type yielded by [Matcher]. */
+typealias Item<E> = TokResult<Int, Token, E>
 
 /** The built-in lalrpop lexer. */
 class MatcherBuilder private constructor(
@@ -14,11 +17,12 @@ class MatcherBuilder private constructor(
         fun new(exprs: Iterable<Pair<String, Boolean>>): Result<MatcherBuilder> {
             val compiled = mutableListOf<LexerExpr>()
             for ((regex, skip) in exprs) {
-                val compiledRegex = try {
-                    Regex(regex)
-                } catch (e: Throwable) {
-                    return Result.failure(BuildError(regex, e))
-                }
+                val compiledRegex =
+                    try {
+                        Regex(regex)
+                    } catch (e: Throwable) {
+                        return Result.failure(BuildError(regex, e))
+                    }
                 compiled.add(LexerExpr(compiledRegex, skip))
             }
             return Result.success(MatcherBuilder(compiled))
@@ -64,33 +68,34 @@ class Matcher<E> internal constructor(
                 return null
             }
 
-            val match = findMatch()
-                ?: return TokResult.Err(ParseError.InvalidToken(location = startOffset))
-            val result = text.substring(0, match.endOffset)
-            text = text.substring(match.endOffset)
-            consumed = startOffset + match.endOffset
+            val foundMatch =
+                findMatch()
+                    ?: return TokResult.Err(ParseError.InvalidToken(location = startOffset))
+            val result = text.substring(0, foundMatch.endOffset)
+            text = text.substring(foundMatch.endOffset)
+            consumed = startOffset + foundMatch.endOffset
 
-            if (exprs[match.index].skip) {
-                if (match.endOffset == 0) {
+            if (exprs[foundMatch.index].skip) {
+                if (foundMatch.endOffset == 0) {
                     return TokResult.Err(ParseError.InvalidToken(location = startOffset))
                 }
                 continue
             }
 
-            return TokResult.Ok(Triple(startOffset, Token(match.index, result), consumed))
+            return TokResult.Ok(Triple(startOffset, Token(foundMatch.index, result), consumed))
         }
     }
 
     private fun findMatch(): LexerMatch? {
         var best: LexerMatch? = null
         for ((index, expr) in exprs.withIndex()) {
-            val match = expr.regex.find(text) ?: continue
-            if (match.range.first != 0) {
+            val matchedRegex = expr.regex.find(text) ?: continue
+            if (matchedRegex.range.first != 0) {
                 continue
             }
-            val length = match.value.length
+            val length = matchedRegex.value.length
             val current = best
-            if (current == null || length > current.endOffset || length == current.endOffset && index > current.index) {
+            if (current == null || length > current.endOffset || (length == current.endOffset && index > current.index)) {
                 best = LexerMatch(index, length)
             }
         }

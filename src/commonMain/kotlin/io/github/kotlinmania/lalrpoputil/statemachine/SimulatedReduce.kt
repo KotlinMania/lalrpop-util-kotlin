@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0 OR MIT
-// port-lint: source src/state_machine.rs
+// port-lint: source state_machine.rs
 package io.github.kotlinmania.lalrpoputil.statemachine
 
 /**

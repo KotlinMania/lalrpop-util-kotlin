@@ -1,8 +1,13 @@
 // SPDX-License-Identifier: Apache-2.0 OR MIT
-// port-lint: source src/state_machine.rs
+// port-lint: source state_machine.rs
 package io.github.kotlinmania.lalrpoputil.statemachine
 
 import io.github.kotlinmania.lalrpoputil.ErrorRecovery
+
+typealias ParseError<L, T, E> = io.github.kotlinmania.lalrpoputil.ParseError<L, T, E>
+typealias TokenTriple<L, T> = Triple<L, T, L>
+typealias SymbolTriple<L, S> = Triple<L, S, L>
+typealias ErrorRecovery<L, T, E> = io.github.kotlinmania.lalrpoputil.ErrorRecovery<L, T, E>
 
 /**
  * The core trait implemented by every LALRPOP-generated parser.
@@ -109,7 +114,7 @@ interface ParserDefinition<
      * Returns a non-`null` [ParseResult] if we reduced the start state and
      * hence parsing is complete, or if we encountered an irrecoverable error.
      *
-     * FIXME. It would be nice to not have so much logic live in reduce. It
+     * Note: It would be nice to not have so much logic live in reduce. It
      * should just be given an iterator of popped symbols and return the newly
      * produced symbol (or error). We can use [simulateReduce] and our own
      * information to drive the rest, right? This would also allow us — I

@@ -1,5 +1,4 @@
 // SPDX-License-Identifier: Apache-2.0 OR MIT
-// port-lint: source src/lexer.rs
 package io.github.kotlinmania.lalrpoputil.lexer
 
 import io.github.kotlinmania.lalrpoputil.ParseError
@@ -17,13 +16,15 @@ class MatcherTest {
 
     @Test
     fun matcherYieldsTokensWithSpans() {
-        val builder = MatcherBuilder.new(
-            listOf(
-                "[ \\t\\n]+".toPattern(skip = true),
-                "[0-9]+".toPattern(skip = false),
-                "[a-z]+".toPattern(skip = false),
-            )
-        ).getOrThrow()
+        val builder =
+            MatcherBuilder
+                .new(
+                    listOf(
+                        "[ \\t\\n]+".toPattern(skip = true),
+                        "[0-9]+".toPattern(skip = false),
+                        "[a-z]+".toPattern(skip = false),
+                    ),
+                ).getOrThrow()
 
         val items = builder.matcher<String>("abc 123").asSequence().toList()
 
@@ -38,13 +39,15 @@ class MatcherTest {
 
     @Test
     fun matcherChoosesLongestMatchThenHighestPatternIndex() {
-        val builder = MatcherBuilder.new(
-            listOf(
-                "a".toPattern(skip = false),
-                "ab".toPattern(skip = false),
-                "ab".toPattern(skip = false),
-            )
-        ).getOrThrow()
+        val builder =
+            MatcherBuilder
+                .new(
+                    listOf(
+                        "a".toPattern(skip = false),
+                        "ab".toPattern(skip = false),
+                        "ab".toPattern(skip = false),
+                    ),
+                ).getOrThrow()
 
         val item = builder.matcher<String>("ab").next()
 

@@ -1,5 +1,4 @@
 // SPDX-License-Identifier: Apache-2.0 OR MIT
-// port-lint: ignore — Kotlin-only standalone LR(1) driver that consumes a
 // ParseTables object directly. Upstream emits the equivalent loop inline in
 // generated Rust source as the body of `parse(..)` on each per-grammar
 // `*Parser` struct. This driver lets all grammars share one well-tested loop
@@ -65,8 +64,9 @@ class TableDrivenLr1Driver<S, L> internal constructor(
                 rawAction > 0 -> {
                     // Shift — push the lookahead onto both stacks, advance.
                     val targetState = rawAction.toInt() - 1
-                    val tok = lookahead
-                        ?: error("driver shifted on EOF — table compiled wrong at state $topState")
+                    val tok =
+                        lookahead
+                            ?: error("driver shifted on EOF — table compiled wrong at state $topState")
                     symbolStack.push(tok.start, tok.symbol, tok.end)
                     stateStack.addLast(targetState)
                     lookahead = if (tokenIterator.hasNext()) tokenIterator.next() else null
@@ -103,16 +103,17 @@ class TableDrivenLr1Driver<S, L> internal constructor(
                             "${production.rhsLength}"
                     }
 
-                    val produced = result.getOrElse { cause ->
-                        // The production's user code signaled failure. Surface it as
-                        // a typed parse failure carrying the cause, the production we
-                        // were running, and the span we'd computed for it.
-                        return ParseOutcome.ProductionFailure(
-                            productionId = productionId,
-                            span = span,
-                            cause = cause,
-                        )
-                    }
+                    val produced =
+                        result.getOrElse { cause ->
+                            // The production's user code signaled failure. Surface it as
+                            // a typed parse failure carrying the cause, the production we
+                            // were running, and the span we'd computed for it.
+                            return ParseOutcome.ProductionFailure(
+                                productionId = productionId,
+                                span = span,
+                                cause = cause,
+                            )
+                        }
 
                     if (productionId == tables.acceptProductionId) {
                         return ParseOutcome.Success(produced, span)
@@ -169,8 +170,10 @@ data class TerminalToken<S, L>(
  *   `Result.failure`. The driver propagates the cause unchanged.
  */
 sealed class ParseOutcome<out S, out L> {
-    data class Success<out S, out L>(val tree: S, val span: ProductionSpan<L>) :
-        ParseOutcome<S, L>()
+    data class Success<out S, out L>(
+        val tree: S,
+        val span: ProductionSpan<L>,
+    ) : ParseOutcome<S, L>()
 
     data class Failure<out S, out L>(
         val state: Int,

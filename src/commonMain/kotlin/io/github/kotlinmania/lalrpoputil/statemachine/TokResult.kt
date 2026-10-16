@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0 OR MIT
-// port-lint: source src/state_machine.rs
+// port-lint: source state_machine.rs
 package io.github.kotlinmania.lalrpoputil.statemachine
 
 import io.github.kotlinmania.lalrpoputil.ParseError
@@ -20,8 +20,12 @@ import io.github.kotlinmania.lalrpoputil.ParseError
  */
 sealed class TokResult<L, T, E> {
     /** The tokenizer produced a `(start, token, end)` triple. */
-    data class Ok<L, T, E>(val value: Triple<L, T, L>) : TokResult<L, T, E>()
+    data class Ok<L, T, E>(
+        val value: Triple<L, T, L>,
+    ) : TokResult<L, T, E>()
 
     /** The tokenizer surfaced a parse error before producing a usable token. */
-    data class Err<L, T, E>(val error: ParseError<L, T, E>) : TokResult<L, T, E>()
+    data class Err<L, T, E>(
+        val error: ParseError<L, T, E>,
+    ) : TokResult<L, T, E>()
 }

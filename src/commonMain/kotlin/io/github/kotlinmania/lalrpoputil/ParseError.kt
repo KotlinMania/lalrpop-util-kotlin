@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0 OR MIT
-// port-lint: source src/lib.rs
+// port-lint: source lib.rs
 package io.github.kotlinmania.lalrpoputil
 
 /**
@@ -68,23 +68,34 @@ sealed class ParseError<L, T, E> {
 
     final override fun toString(): String = fmt()
 
-    private fun fmt(): String = when (this) {
-        is User -> error.toString()
-        is InvalidToken -> "Invalid token at $location"
-        is UnrecognizedEof -> StringBuilder("Unrecognized EOF found at $location")
-            .also { fmtExpected(it, expected) }
-            .toString()
-        is UnrecognizedToken -> {
-            val (start, tok, end) = token
-            StringBuilder("Unrecognized token `$tok` found at $start:$end")
-                .also { fmtExpected(it, expected) }
-                .toString()
+    private fun fmt(): String =
+        when (this) {
+            is User -> {
+                error.toString()
+            }
+
+            is InvalidToken -> {
+                "Invalid token at $location"
+            }
+
+            is UnrecognizedEof -> {
+                StringBuilder("Unrecognized EOF found at $location")
+                    .also { fmtExpected(it, expected) }
+                    .toString()
+            }
+
+            is UnrecognizedToken -> {
+                val (start, tok, end) = token
+                StringBuilder("Unrecognized token `$tok` found at $start:$end")
+                    .also { fmtExpected(it, expected) }
+                    .toString()
+            }
+
+            is ExtraToken -> {
+                val (start, tok, end) = token
+                "Extra token $tok found at $start:$end"
+            }
         }
-        is ExtraToken -> {
-            val (start, tok, end) = token
-            "Extra token $tok found at $start:$end"
-        }
-    }
 
     private fun <LL, TT, EE> mapIntern(
         locOp: (L) -> LL,
@@ -156,12 +167,15 @@ private fun fmtExpected(sb: StringBuilder, expected: List<String>) {
     if (expected.isNotEmpty()) {
         sb.append('\n')
         for ((i, e) in expected.withIndex()) {
-            val sep = when {
-                i == 0 -> "Expected one of"
-                i < expected.size - 1 -> ","
-                // Last expected message to be written.
-                else -> " or"
-            }
+            val sep =
+                when {
+                    i == 0 -> "Expected one of"
+
+                    i < expected.size - 1 -> ","
+
+                    // Last expected message to be written.
+                    else -> " or"
+                }
             sb.append("$sep $e")
         }
     }

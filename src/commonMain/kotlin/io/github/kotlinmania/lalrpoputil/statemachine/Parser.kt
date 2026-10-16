@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0 OR MIT
-// port-lint: source src/state_machine.rs
+// port-lint: source state_machine.rs
 package io.github.kotlinmania.lalrpoputil.statemachine
 
 import io.github.kotlinmania.lalrpoputil.ErrorRecovery
@@ -35,8 +35,16 @@ class Parser<
     NonterminalIndex,
 > private constructor(
     private val definition: ParserDefinition<
-        Location, Error, Token, TokenIndex, Symbol, Success, StateIndex,
-        Action, ReduceIndex, NonterminalIndex,
+        Location,
+        Error,
+        Token,
+        TokenIndex,
+        Symbol,
+        Success,
+        StateIndex,
+        Action,
+        ReduceIndex,
+        NonterminalIndex,
     >,
     private val tokens: Iterator<TokResult<Location, Token, Error>>,
 ) {
@@ -50,17 +58,31 @@ class Parser<
          * resulting [ParseResult]. The static entry point most callers use.
          */
         fun <
-            Location, Error, Token, TokenIndex, Symbol, Success, StateIndex,
-            Action : ParserAction<StateIndex, ReduceIndex>, ReduceIndex, NonterminalIndex,
+            Location,
+            Error,
+            Token,
+            TokenIndex,
+            Symbol,
+            Success,
+            StateIndex,
+            Action : ParserAction<StateIndex, ReduceIndex>,
+            ReduceIndex,
+            NonterminalIndex,
         > drive(
             definition: ParserDefinition<
-                Location, Error, Token, TokenIndex, Symbol, Success, StateIndex,
-                Action, ReduceIndex, NonterminalIndex,
+                Location,
+                Error,
+                Token,
+                TokenIndex,
+                Symbol,
+                Success,
+                StateIndex,
+                Action,
+                ReduceIndex,
+                NonterminalIndex,
             >,
             tokens: Iterator<TokResult<Location, Token, Error>>,
-        ): ParseResult<Success, Location, Token, Error> {
-            return Parser(definition, tokens).parse()
-        }
+        ): ParseResult<Success, Location, Token, Error> = Parser(definition, tokens).parse()
     }
 
     private fun topState(): StateIndex = states.last()
@@ -70,11 +92,12 @@ class Parser<
         // token from the input. We break from the loop when the end of the
         // input is reached (we return early if an error occurs).
         shift@ while (true) {
-            var pair = when (val nt0 = nextToken()) {
-                is NextToken.FoundToken -> nt0.lookahead to nt0.tokenIndex
-                is NextToken.Eof -> return parseEof()
-                is NextToken.Done -> return nt0.result
-            }
+            var pair =
+                when (val nt0 = nextToken()) {
+                    is NextToken.FoundToken -> nt0.lookahead to nt0.tokenIndex
+                    is NextToken.Eof -> return parseEof()
+                    is NextToken.Done -> return nt0.result
+                }
 
             debug { "+ SHIFT: ${pair.first}" }
             debug { "\\ token_index: ${pair.second}" }
@@ -106,6 +129,7 @@ class Parser<
                         return when (r) {
                             // We reached eof, but still have lookahead.
                             is ParseResult.Success -> ParseResult.Failure(ParseError.ExtraToken(lookahead))
+
                             is ParseResult.Failure -> r
                         }
                     }
@@ -117,8 +141,14 @@ class Parser<
                             pair = nt.lookahead to nt.tokenIndex
                             continue@inner
                         }
-                        is NextToken.Eof -> return parseEof()
-                        is NextToken.Done -> return nt.result
+
+                        is NextToken.Eof -> {
+                            return parseEof()
+                        }
+
+                        is NextToken.Done -> {
+                            return nt.result
+                        }
                     }
                 }
             }
@@ -159,7 +189,7 @@ class Parser<
             debug { "\\ error -- no error recovery!" }
 
             return NextToken.Done(
-                ParseResult.Failure(unrecognizedTokenError(optLookahead, states))
+                ParseResult.Failure(unrecognizedTokenError(optLookahead, states)),
             )
         }
 
@@ -247,11 +277,13 @@ class Parser<
                     optLookahead = nt.lookahead
                     optTokenIndex = nt.tokenIndex
                 }
+
                 is NextToken.Eof -> {
                     debug { "\\\\\\ reached EOF" }
                     optLookahead = null
                     optTokenIndex = null
                 }
+
                 is NextToken.Done -> {
                     debug { "\\\\\\ no more tokens" }
                     return NextToken.Done(nt.result)
@@ -284,15 +316,16 @@ class Parser<
         //
         // Finally, if there are no popped states *nor* dropped tokens, we
         // can use the end of the top-most state.
-        val start: Location = if (top < symbols.size) {
-            symbols[top].first
-        } else if (droppedTokens.isNotEmpty()) {
-            droppedTokens.first().first
-        } else if (top > 0) {
-            symbols[top - 1].third
-        } else {
-            definition.startLocation()
-        }
+        val start: Location =
+            if (top < symbols.size) {
+                symbols[top].first
+            } else if (droppedTokens.isNotEmpty()) {
+                droppedTokens.first().first
+            } else if (top > 0) {
+                symbols[top - 1].third
+            } else {
+                definition.startLocation()
+            }
 
         // For the end span, here are the possibilities:
         //
@@ -320,26 +353,29 @@ class Parser<
         //
         //       a + (b c)
         //             -
-        val end: Location = if (droppedTokens.isNotEmpty()) {
-            droppedTokens.last().third
-        } else if (statesLen - 1 > top) {
-            symbols.last().third
-        } else {
-            val la = optLookahead
-            la?.first ?: start
-        }
+        val end: Location =
+            if (droppedTokens.isNotEmpty()) {
+                droppedTokens.last().third
+            } else if (statesLen - 1 > top) {
+                symbols.last().third
+            } else {
+                val la = optLookahead
+                la?.first ?: start
+            }
 
         truncate(states, top + 1)
         truncate(symbols, top)
 
         val recoverState = states[top]
         val errorAction = definition.errorAction(recoverState)
-        val errorState = errorAction.asShift()
-            ?: error("expected error action to be a shift, was $errorAction")
+        val errorState =
+            errorAction.asShift()
+                ?: error("expected error action to be a shift, was $errorAction")
         states.add(errorState)
-        val recovery = definition.errorRecoverySymbol(
-            ErrorRecovery(error = error, droppedTokens = droppedTokens)
-        )
+        val recovery =
+            definition.errorRecoverySymbol(
+                ErrorRecovery(error = error, droppedTokens = droppedTokens),
+            )
         symbols.add(Triple(start, recovery, end))
 
         val lf = optLookahead
@@ -381,11 +417,12 @@ class Parser<
         while (true) {
             var statesLen = scratch.size
             val top = scratch[statesLen - 1]
-            val action = if (optTokenIndex == null) {
-                definition.eofAction(top)
-            } else {
-                definition.action(top, optTokenIndex)
-            }
+            val action =
+                if (optTokenIndex == null) {
+                    definition.eofAction(top)
+                } else {
+                    definition.action(top, optTokenIndex)
+                }
 
             // If we encounter an error action, we do **not** accept.
             if (action.isError()) {
@@ -405,6 +442,7 @@ class Parser<
                         val nextState = definition.goto(newTop, sim.nonterminalProduced)
                         scratch.add(nextState)
                     }
+
                     is SimulatedReduce.Accept -> {
                         debug { "\\\\\\\\ accepts: reduce accepts!" }
                         return true
@@ -422,15 +460,13 @@ class Parser<
     private fun reduce(
         action: ReduceIndex,
         lookaheadStart: Location?,
-    ): ParseResult<Success, Location, Token, Error>? {
-        return definition.reduce(action, lookaheadStart, states, symbols)
-    }
+    ): ParseResult<Success, Location, Token, Error>? = definition.reduce(action, lookaheadStart, states, symbols)
 
     private fun unrecognizedTokenError(
         token: Triple<Location, Token, Location>?,
         states: List<StateIndex>,
-    ): ParseError<Location, Token, Error> {
-        return if (token != null) {
+    ): ParseError<Location, Token, Error> =
+        if (token != null) {
             ParseError.UnrecognizedToken(
                 token = token,
                 expected = definition.expectedTokensFromStates(states),
@@ -441,7 +477,6 @@ class Parser<
                 expected = definition.expectedTokensFromStates(states),
             )
         }
-    }
 
     /**
      * Consume the next token from the input and classify it into a token
@@ -452,17 +487,19 @@ class Parser<
         if (!tokens.hasNext()) {
             return NextToken.Eof()
         }
-        val token: Triple<Location, Token, Location> = when (val tr = tokens.next()) {
-            is TokResult.Ok -> tr.value
-            is TokResult.Err -> return NextToken.Done(ParseResult.Failure(tr.error))
-        }
+        val token: Triple<Location, Token, Location> =
+            when (val tr = tokens.next()) {
+                is TokResult.Ok -> tr.value
+                is TokResult.Err -> return NextToken.Done(ParseResult.Failure(tr.error))
+            }
 
         lastLocation = token.third
 
-        val tokenIndex = definition.tokenToIndex(token.second)
-            ?: return NextToken.Done(
-                ParseResult.Failure(unrecognizedTokenError(token, states))
-            )
+        val tokenIndex =
+            definition.tokenToIndex(token.second)
+                ?: return NextToken.Done(
+                    ParseResult.Failure(unrecognizedTokenError(token, states)),
+                )
 
         return NextToken.FoundToken(token, tokenIndex)
     }
@@ -479,8 +516,7 @@ private sealed class NextToken<Location, Token, TokenIndex, Success, Error> {
         val tokenIndex: TokenIndex,
     ) : NextToken<Location, Token, TokenIndex, Success, Error>()
 
-    class Eof<Location, Token, TokenIndex, Success, Error> :
-        NextToken<Location, Token, TokenIndex, Success, Error>()
+    class Eof<Location, Token, TokenIndex, Success, Error> : NextToken<Location, Token, TokenIndex, Success, Error>()
 
     class Done<Location, Token, TokenIndex, Success, Error>(
         val result: ParseResult<Success, Location, Token, Error>,
