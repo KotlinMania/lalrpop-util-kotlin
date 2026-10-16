@@ -1,5 +1,4 @@
 // SPDX-License-Identifier: Apache-2.0 OR MIT
-// port-lint: ignore — Kotlin-only stack used by table-driven generated parsers.
 // Upstream embeds the equivalent run-time stack inline in generated parser
 // source as a `Vec<(L, Symbol, L)>` and reaches into it directly from action
 // bodies. This typed wrapper lets the Kotlin-emit codegen produce action

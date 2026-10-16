@@ -1,5 +1,4 @@
 // SPDX-License-Identifier: Apache-2.0 OR MIT
-// port-lint: ignore — Kotlin-only packed parse-table container. Upstream
 // embeds the same data inline in generated Rust source as `const __ACTION:
 // &[i16]`, `const __EOF_ACTION: &[i16]`, and `const __GOTO: &[i16]` arrays.
 // The Kotlin-emit codegen lifts those arrays into a single value object so
@@ -61,6 +60,7 @@ class ParseTables<S, L> internal constructor(
         productions = productions.toList(),
         acceptProductionId = acceptProductionId,
     )
+
     init {
         require(action.size == numStates * numTerminals) {
             "action table size ${action.size} != $numStates * $numTerminals"

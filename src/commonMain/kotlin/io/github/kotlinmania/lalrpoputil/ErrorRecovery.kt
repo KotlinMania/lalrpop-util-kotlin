@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0 OR MIT
-// port-lint: source src/lib.rs
+// port-lint: source lib.rs
 package io.github.kotlinmania.lalrpoputil
 
 /**

@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0 OR MIT
-// port-lint: source src/lexer.rs
+// port-lint: source lexer.rs
 package io.github.kotlinmania.lalrpoputil.lexer
 
 /** A token matched by the built-in lalrpop lexer. */
@@ -12,5 +12,7 @@ data class Token(
         return if (indexCmp != 0) indexCmp else text.compareTo(other.text)
     }
 
-    override fun toString(): String = text
+    fun fmt(): String = text
+
+    override fun toString(): String = fmt()
 }

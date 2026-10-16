@@ -1,5 +1,4 @@
 // SPDX-License-Identifier: Apache-2.0 OR MIT
-// port-lint: ignore — Kotlin-only adapter that exposes a [ParseTables] +
 // callbacks bundle through the upstream-shape [ParserDefinition] interface,
 // so the same well-tested [Parser] driver loop walks a data-driven grammar
 // the same way it walks a hand-coded one. Upstream has no equivalent because
@@ -66,7 +65,6 @@ class TableDrivenParserDefinition<S, L, T, E> internal constructor(
     /** Per-state list of human-readable expected-terminal names, used in error messages. */
     private val expectedTokensFor: (state: Int) -> List<String>,
 ) : ParserDefinition<L, E, T, Int, S, S, Int, IntAction, Int, Int> {
-
     override fun startLocation(): L = initialLocation
 
     override fun startState(): Int = 0
@@ -125,16 +123,18 @@ class TableDrivenParserDefinition<S, L, T, E> internal constructor(
         repeat(n) { symbols.removeLast() }
         repeat(n) { states.removeLast() }
 
-        val span: ProductionSpan<L> = if (popped.isNotEmpty()) {
-            ProductionSpan(popped.first().first, popped.last().third)
-        } else {
-            // Empty (epsilon) production. Anchor to the lookahead's start, falling back
-            // to the previous symbol's end, then to the parser's initial location.
-            val anchor = startLocation
-                ?: symbols.lastOrNull()?.third
-                ?: initialLocation
-            ProductionSpan(anchor, anchor)
-        }
+        val span: ProductionSpan<L> =
+            if (popped.isNotEmpty()) {
+                ProductionSpan(popped.first().first, popped.last().third)
+            } else {
+                // Empty (epsilon) production. Anchor to the lookahead's start, falling back
+                // to the previous symbol's end, then to the parser's initial location.
+                val anchor =
+                    startLocation
+                        ?: symbols.lastOrNull()?.third
+                        ?: initialLocation
+                ProductionSpan(anchor, anchor)
+            }
 
         val actionStack = ParseStack<S, L>(initialCapacity = n)
         for (entry in popped) actionStack.push(entry.first, entry.second, entry.third)
@@ -146,9 +146,10 @@ class TableDrivenParserDefinition<S, L, T, E> internal constructor(
                 "action lambda doesn't match declared rhsLength $n"
         }
 
-        val produced = result.getOrElse { cause ->
-            return ParseResult.Failure(mapActionFailure(cause))
-        }
+        val produced =
+            result.getOrElse { cause ->
+                return ParseResult.Failure(mapActionFailure(cause))
+            }
 
         if (reduceIndex == tables.acceptProductionId) {
             return ParseResult.Success(produced)

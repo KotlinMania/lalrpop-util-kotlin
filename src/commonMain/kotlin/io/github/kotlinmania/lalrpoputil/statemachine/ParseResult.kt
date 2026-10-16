@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0 OR MIT
-// port-lint: source src/state_machine.rs
+// port-lint: source state_machine.rs
 package io.github.kotlinmania.lalrpoputil.statemachine
 
 import io.github.kotlinmania.lalrpoputil.ParseError
@@ -7,7 +7,7 @@ import io.github.kotlinmania.lalrpoputil.ParseError
 /**
  * Result of a parse: either a fully reduced success value, or a parse error.
  *
- * The upstream type alias is `pub type ParseResult<D> = Result<Success<D>,
+ * The upstream type alias is `ParseResult<D> = Result<Success<D>,
  * ParseError<D>>`, where `Success<D>` is the start-symbol output and
  * `ParseError<D>` is the runtime error type. Kotlin's built-in `Result<T>`
  * constrains its error to `Throwable`, so this sealed class is the
@@ -21,8 +21,12 @@ import io.github.kotlinmania.lalrpoputil.ParseError
  */
 sealed class ParseResult<S, L, T, E> {
     /** A fully reduced parse with [value] produced from the start symbol. */
-    data class Success<S, L, T, E>(val value: S) : ParseResult<S, L, T, E>()
+    data class Success<S, L, T, E>(
+        val value: S,
+    ) : ParseResult<S, L, T, E>()
 
     /** The parse failed with [error] before reducing the start symbol. */
-    data class Failure<S, L, T, E>(val error: ParseError<L, T, E>) : ParseResult<S, L, T, E>()
+    data class Failure<S, L, T, E>(
+        val error: ParseError<L, T, E>,
+    ) : ParseResult<S, L, T, E>()
 }

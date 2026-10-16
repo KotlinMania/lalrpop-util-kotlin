@@ -5,13 +5,15 @@ Based on AST analysis, here are the concrete next steps.
 ## Summary
 
 - **Files Present:** 3/3 (100.0%)
-- **Function parity:** 21/23 matched (target 61) — 91.3%
-- **Class/type parity:** 12/21 matched (target 34) — 57.1%
-- **Combined symbol parity:** 33/44 matched (target 95) — 75.0%
-- **Average inline-code cosine:** 0.00 (function body across 2 matched files)
-- **Average documentation cosine:** 0.55 (doc text across 2 matched files)
-- **Cheat-zeroed Files:** 3
+- **Function parity:** 23/23 matched (target 56) — 100.0%
+- **Class/type parity:** 17/21 matched (target 38) — 81.0%
+- **Combined symbol parity:** 40/44 matched (target 94) — 90.9%
+- **Average inline-code cosine:** 0.16 (function body across 3 matched files)
+- **Average documentation cosine:** 0.62 (doc text across 3 matched files)
+- **Cheat-zeroed Files:** 0
 - **Critical Issues:** 3 files with <0.60 function similarity
+- **Needs Review:** 0 files with 0.60-0.84 function similarity
+- **Excellent:** 0 files with >=0.85 function similarity
 
 ## Priority 1: Fix Incomplete High-Dependency Files
 
@@ -29,66 +31,37 @@ Every matched file is listed below with function and type symbol parity.
 
 ### 1. state_machine
 
-- **Target:** `statemachine.Parser [ZERO] [PROVENANCE-FALLBACK]`
-- **Similarity:** 0.00
+- **Target:** `statemachine.Parser`
+- **Similarity:** 0.24
 - **Dependents:** 0
-- **Priority Score:** 82510.0
+- **Priority Score:** 42507.6
 - **Functions:** 10/10 matched (target 27)
 - **Missing functions:** _none_
-- **Types:** 7/15 matched (target 19)
-- **Missing types:** `Location`, `Token`, `Error`, `Symbol`, `ParseError`, `TokenTriple`, `SymbolTriple`, `ErrorRecovery`
-- **Provenance warning:** port-lint provenance header matched only after fallback normalization: `src/state_machine.rs` vs expected `state_machine.rs`
-- **Provenance warning:** port-lint provenance header matched only after fallback normalization: `src/state_machine.rs` vs expected `state_machine.rs`
-- **Provenance warning:** port-lint provenance header matched only after fallback normalization: `src/state_machine.rs` vs expected `state_machine.rs`
-- **Provenance warning:** port-lint provenance header matched only after fallback normalization: `src/state_machine.rs` vs expected `state_machine.rs`
-- **Provenance warning:** port-lint provenance header matched only after fallback normalization: `src/state_machine.rs` vs expected `state_machine.rs`
-- **Provenance warning:** port-lint provenance header matched only after fallback normalization: `src/state_machine.rs` vs expected `state_machine.rs`
-- **Proposed provenance header:** `// port-lint: source state_machine.rs` (current: `// port-lint: source src/state_machine.rs`)
-- **Proposed provenance header:** `// port-lint: source state_machine.rs` (current: `// port-lint: source src/state_machine.rs`)
-- **Proposed provenance header:** `// port-lint: source state_machine.rs` (current: `// port-lint: source src/state_machine.rs`)
-- **Proposed provenance header:** `// port-lint: source state_machine.rs` (current: `// port-lint: source src/state_machine.rs`)
-- **Proposed provenance header:** `// port-lint: source state_machine.rs` (current: `// port-lint: source src/state_machine.rs`)
-- **Proposed provenance header:** `// port-lint: source state_machine.rs` (current: `// port-lint: source src/state_machine.rs`)
-- **Lint issues:** 6
+- **Types:** 11/15 matched (target 23)
+- **Missing types:** `Location`, `Token`, `Error`, `Symbol`
 
-### 2. lexer
+### 2. lib
 
-- **Target:** `lexer.Token [ZERO] [PROVENANCE-FALLBACK]`
-- **Similarity:** 0.00
+- **Target:** `lalrpoputil.ParseError`
+- **Similarity:** 0.22
 - **Dependents:** 0
-- **Priority Score:** 20810.0
-- **Functions:** 3/4 matched (target 15)
-- **Missing functions:** `fmt`
-- **Types:** 3/4 matched (target 7)
-- **Missing types:** `Item`
-- **Provenance warning:** port-lint provenance header matched only after fallback normalization: `src/lexer.rs` vs expected `lexer.rs`
-- **Provenance warning:** port-lint provenance header matched only after fallback normalization: `src/lexer.rs` vs expected `lexer.rs`
-- **Provenance warning:** port-lint provenance header matched only after fallback normalization: `src/lexer.rs` vs expected `lexer.rs`
-- **Provenance warning:** port-lint provenance header matched only after fallback normalization: `src/lexer.rs` vs expected `lexer.rs`
-- **Proposed provenance header:** `// port-lint: source lexer.rs` (current: `// port-lint: source src/lexer.rs`)
-- **Proposed provenance header:** `// port-lint: source lexer.rs` (current: `// port-lint: source src/lexer.rs`)
-- **Proposed provenance header:** `// port-lint: source lexer.rs` (current: `// port-lint: source src/lexer.rs`)
-- **Proposed provenance header:** `// port-lint: source lexer.rs` (current: `// port-lint: source src/lexer.rs`)
-- **Lint issues:** 4
-
-### 3. lib
-
-- **Target:** `lalrpoputil.ParseError [STUB] [PROVENANCE-FALLBACK]`
-- **Similarity:** 0.00
-- **Dependents:** 0
-- **Priority Score:** 11110.0
-- **Functions:** 8/9 matched (target 19)
-- **Missing functions:** `description`
+- **Priority Score:** 1107.8
+- **Functions:** 9/9 matched (target 20)
+- **Missing functions:** _none_
 - **Types:** 2/2 matched (target 8)
 - **Missing types:** _none_
 - **Tests:** 1/1 matched
-- **Provenance warning:** port-lint provenance header matched only after fallback normalization: `src/lib.rs` vs expected `lib.rs`
-- **Provenance warning:** port-lint provenance header matched only after fallback normalization: `src/lib.rs` vs expected `lib.rs`
-- **Provenance warning:** port-lint provenance header matched only after fallback normalization: `src/lib.rs` vs expected `lib.rs`
-- **Proposed provenance header:** `// port-lint: source lib.rs` (current: `// port-lint: source src/lib.rs`)
-- **Proposed provenance header:** `// port-lint: source lib.rs` (current: `// port-lint: source src/lib.rs`)
-- **Proposed provenance header:** `// port-lint: source lib.rs` (current: `// port-lint: source src/lib.rs`)
-- **Lint issues:** 3
+
+### 3. lexer
+
+- **Target:** `lexer.Token`
+- **Similarity:** 0.02
+- **Dependents:** 0
+- **Priority Score:** 809.8
+- **Functions:** 4/4 matched (target 9)
+- **Missing functions:** _none_
+- **Types:** 4/4 matched (target 7)
+- **Missing types:** _none_
 
 ## Success Criteria
 

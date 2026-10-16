@@ -10,15 +10,13 @@ This list is complete and includes function/type detail for every matched file. 
 
 | Rank | Source | Target | Function similarity | Deps | Functions | Missing functions | Types | Missing types | SymDeficit | SrcSymbols | Priority |
 |------|--------|--------|------------|------|-----------|-------------------|-------|---------------|-----------|------------|----------|
-| 1 | `state_machine` | `statemachine.Parser [ZERO] [PROVENANCE-FALLBACK]` | 0.00 | 0 | 10/10 matched (target 27) | _none_ | 7/15 matched (target 19) | `Location`, `Token`, `Error`, `Symbol`, `ParseError`, `TokenTriple`, `SymbolTriple`, `ErrorRecovery` | 8 | 25 | 82510.0 |
-| 2 | `lexer` | `lexer.Token [ZERO] [PROVENANCE-FALLBACK]` | 0.00 | 0 | 3/4 matched (target 15) | `fmt` | 3/4 matched (target 7) | `Item` | 2 | 8 | 20810.0 |
-| 3 | `lib` | `lalrpoputil.ParseError [STUB] [PROVENANCE-FALLBACK]` | 0.00 | 0 | 8/9 matched (target 19) | `description` | 2/2 matched (target 8) | _none_ | 1 | 11 | 11110.0 |
+| 1 | `state_machine` | `statemachine.Parser` | 0.24 | 0 | 10/10 matched (target 27) | _none_ | 11/15 matched (target 23) | `Location`, `Token`, `Error`, `Symbol` | 4 | 25 | 42507.6 |
+| 2 | `lib` | `lalrpoputil.ParseError` | 0.22 | 0 | 9/9 matched (target 20) | _none_ | 2/2 matched (target 8) | _none_ | 0 | 11 | 1107.8 |
+| 3 | `lexer` | `lexer.Token` | 0.02 | 0 | 4/4 matched (target 9) | _none_ | 4/4 matched (target 7) | _none_ | 0 | 8 | 809.8 |
 
 ## Cheat Detection / Scoring Failures
 
-- `state_machine` -> `statemachine.Parser [ZERO] [PROVENANCE-FALLBACK]`: function-by-function score forced to 0. ParserAction.kt: snake_case identifier `integral_indices` in Kotlin comments; ParserAction.kt: Rust `pub` item in Kotlin comments
-- `lexer` -> `lexer.Token [ZERO] [PROVENANCE-FALLBACK]`: function-by-function score forced to 0. MatcherBuilder.kt: Rust `match` expression in Kotlin code
-- `lib` -> `lalrpoputil.ParseError [STUB] [PROVENANCE-FALLBACK]`: function-by-function score forced to 0. target contains TODO/stub/placeholder markers in function bodies
+_None detected._
 
 ## Critical Issues (Function Similarity < 0.60 with Dependencies)
 
