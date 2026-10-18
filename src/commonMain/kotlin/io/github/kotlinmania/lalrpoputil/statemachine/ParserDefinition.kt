@@ -4,10 +4,8 @@ package io.github.kotlinmania.lalrpoputil.statemachine
 
 import io.github.kotlinmania.lalrpoputil.ErrorRecovery
 
-typealias ParseError<L, T, E> = io.github.kotlinmania.lalrpoputil.ParseError<L, T, E>
 typealias TokenTriple<L, T> = Triple<L, T, L>
 typealias SymbolTriple<L, S> = Triple<L, S, L>
-typealias ErrorRecovery<L, T, E> = io.github.kotlinmania.lalrpoputil.ErrorRecovery<L, T, E>
 
 /**
  * The core trait implemented by every LALRPOP-generated parser.
